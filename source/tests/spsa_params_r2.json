@@ -1,0 +1,14 @@
+[
+  {"name": "LmrCutNoPv",    "val": 1800, "min": 800,  "max": 2800, "c": 220, "r": 0.50},
+  {"name": "LmrTtCap",      "val": 900,  "min": 200,  "max": 1800, "c": 180, "r": 0.50},
+  {"name": "LmrCheck",      "val": 900,  "min": 200,  "max": 1800, "c": 180, "r": 0.50},
+  {"name": "LmrKiller",     "val": 900,  "min": 200,  "max": 1800, "c": 180, "r": 0.50},
+  {"name": "LmrCapHistDiv", "val": 10,   "min": 4,    "max": 22,   "c": 2,   "r": 0.50},
+  {"name": "QsFutMargin",   "val": 140,  "min": 60,   "max": 260,  "c": 24,  "r": 0.50},
+  {"name": "CorrPawnW",     "val": 24,   "min": 6,    "max": 50,   "c": 5,   "r": 0.50},
+  {"name": "CorrNonPawnW",  "val": 20,   "min": 6,    "max": 44,   "c": 4,   "r": 0.50},
+  {"name": "CorrMinMajW",   "val": 16,   "min": 4,    "max": 38,   "c": 4,   "r": 0.50},
+  {"name": "CorrContW",     "val": 20,   "min": 4,    "max": 44,   "c": 4,   "r": 0.50},
+  {"name": "TmHardMult",    "val": 240,  "min": 150,  "max": 360,  "c": 25,  "r": 0.50},
+  {"name": "TmNodeScale",   "val": 135,  "min": 85,   "max": 200,  "c": 14,  "r": 0.50}
+]

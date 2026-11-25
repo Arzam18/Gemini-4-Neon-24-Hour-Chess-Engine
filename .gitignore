@@ -1,0 +1,49 @@
+# Build artefacts
+source/build/
+*.o
+*.obj
+*.a
+*.lib
+*.pdb
+*.gcda
+*.gcno
+*.profraw
+*.profdata
+
+# Match output and logs
+*.pgn
+*.log
+!resources/fastchess/UHO.pgn
+
+# Large tuning / temp data
+*.bin
+*.epd.gz
+*.tmp
+
+# Editor / OS noise
+.vscode/
+.idea/
+Thumbs.db
+.DS_Store
+
+# ---- added after the Gemini 4 Neon run ----
+# Self-play training data, training checkpoints and superseded nets (about 2.5 GB).
+# Only the shipped network is tracked; the build copies it to source/data/current.nnue.
+source/data/*
+!source/data/gen5_4x768_65m.nnue
+
+# Full copies of each intermediate version, with executables and nets (173 MB).
+# docs/progress.md describes each one.
+source/snapshots/
+
+# SPSA tool state (the parameter files are kept)
+source/tests/spsa_state.json
+source/tests/spsa_r2_state.json
+
+# Benchmark inputs (fastchess, UHO book, Stash binaries, perft suite, UCI spec):
+# see https://github.com/stevemaughan/chess-engine-benchmark
+/resources/
+/AGENTS.md
+
+# fastchess state file written to the working directory
+/config.json

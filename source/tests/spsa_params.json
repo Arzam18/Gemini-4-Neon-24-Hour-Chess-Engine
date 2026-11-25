@@ -1,0 +1,20 @@
+[
+  {"name": "EvalMatBase",   "val": 24500, "min": 18000, "max": 32000, "c": 1600, "r": 0.45},
+  {"name": "LmrBase",       "val": 75,    "min": 40,    "max": 120,   "c": 12,   "r": 0.45},
+  {"name": "LmrDiv",        "val": 220,   "min": 165,   "max": 290,   "c": 18,   "r": 0.45},
+  {"name": "LmrHistDiv",    "val": 6,     "min": 3,     "max": 14,    "c": 2,    "r": 0.45},
+  {"name": "RfpImp",        "val": 58,    "min": 35,    "max": 95,    "c": 10,   "r": 0.45},
+  {"name": "RfpNonImp",     "val": 80,    "min": 50,    "max": 130,   "c": 12,   "r": 0.45},
+  {"name": "RazorBase",     "val": 250,   "min": 120,   "max": 420,   "c": 35,   "r": 0.45},
+  {"name": "RazorMult",     "val": 210,   "min": 110,   "max": 330,   "c": 30,   "r": 0.45},
+  {"name": "NmpEvalDiv",    "val": 180,   "min": 100,   "max": 280,   "c": 25,   "r": 0.45},
+  {"name": "ProbCutMargin", "val": 185,   "min": 115,   "max": 285,   "c": 25,   "r": 0.45},
+  {"name": "FutBase",       "val": 100,   "min": 45,    "max": 185,   "c": 18,   "r": 0.45},
+  {"name": "FutMult",       "val": 90,    "min": 45,    "max": 150,   "c": 15,   "r": 0.45},
+  {"name": "HistPruneMult", "val": 2000,  "min": 900,   "max": 3800,  "c": 350,  "r": 0.45},
+  {"name": "SeeQuietMult",  "val": 22,    "min": 10,    "max": 42,    "c": 4,    "r": 0.45},
+  {"name": "SeeCapMult",    "val": 85,    "min": 45,    "max": 140,   "c": 14,   "r": 0.45},
+  {"name": "SingMarginNum", "val": 15,    "min": 9,     "max": 28,    "c": 3,    "r": 0.45},
+  {"name": "TmDiv",         "val": 23,    "min": 15,    "max": 35,    "c": 3,    "r": 0.45},
+  {"name": "TmSoftPct",     "val": 72,    "min": 50,    "max": 95,    "c": 7,    "r": 0.45}
+]

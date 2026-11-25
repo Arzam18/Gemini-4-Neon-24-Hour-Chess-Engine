@@ -216,4 +216,74 @@ Built-in CLI subcommands (for verification and self-play):
 
 ## Official Results
 
-*(To be filled in after the official rating tournament.)*
+*This section was added by the benchmark operator after the run. Everything above it is the model's own write-up.*
+
+**3470 ± 14 Elo (95% CI) on the CCRL Blitz scale**, from 2,540 games played on 24 November 2026 (+629 =1036 −875, 45.2%). That is second of the ten engines built under this benchmark so far: 75 Elo behind Fable 5.2 and 11 ahead of Opus 5.5.
+
+The engine had no time loss, crash, disconnect, illegal move or fastchess warning in any of the 2,540 games.
+
+### Conditions
+
+- fastchess 1.8.2, **10 s + 0.1 s**, `timemargin=200`, one thread, **64 MB hash**. (The benchmark rules announced 256 MB hash, and the model tested at 256 MB with `timemargin=0`. The rating run uses 64 MB for every engine.)
+- UHO unbalanced 8-ply openings in random order, every opening played with both colours.
+- Adjudication: resign after 3 moves at ±600 cp from both engines, draw after move 40 with 8 moves inside ±20 cp, 250 moves maximum.
+- 12 concurrent games on a Ryzen AI 9 HX 375 (12 cores), a different laptop from the Intel Core Ultra 9 285H the engine was developed on.
+- A 72-game pilot against Stash 37, Patricia and Elixir came first. The rated games were two gauntlets against ten reference engines (1,800 games), then 740 games against the four nearest AI-written engines. Fable 5.2 is the main rival, so that pairing was played over 320 games, twice the usual number.
+- Ratings come from an anchored maximum-likelihood fit over all 15,140 games in the series. The reference engines are fixed at their CCRL Blitz ratings, and every game involves at least one of the AI-written engines.
+
+### All engines from this benchmark
+
+| Rank | Engine | Elo | 95% CI | Games |
+|---:|---|---:|:---:|---:|
+| 1 | Fable 5.2 chess 24hrs | 3545 | ±14 | 2540 |
+| **2** | **Gemini 4 Neon chess 24hrs** | **3470** | **±14** | **2540** |
+| 3 | Opus 5.5 chess 24hrs | 3459 | ±15 | 2500 |
+| 4 | Sonnet 5.5 chess 24hrs | 3414 | ±15 | 2500 |
+| 5 | Fable 5.1 chess 24hrs | 3251 | ±18 | 1780 |
+| 6 | Opus 5 chess 24hrs | 3227 | ±19 | 1580 |
+| 7 | Astra 6 chess 24hrs | 3142 | ±19 | 1520 |
+| 8 | Fable 5 chess 24hrs | 3044 | ±21 | 1300 |
+| 9 | Haiku 5.5 chess 24hrs | 2765 | ±24 | 1060 |
+| 10 | Sonnet 5 chess 24hrs | 2703 | ±23 | 1360 |
+
+The 11-Elo margin over Opus 5.5 is inside the error bars of both engines. Gemini 4 Neon did win their direct match, 55.3% over 160 games.
+
+### Head-to-head
+
+| Opponent | CCRL Blitz | +W | =D | −L | Score | Implied Elo |
+|---|---:|---:|---:|---:|---:|---:|
+| Coda 0.9.4 | 3638 | 0 | 46 | 114 | 14.4% | 3328 |
+| Clover 9.0 | 3620 | 2 | 29 | 129 | 10.3% | 3244 |
+| Elixir 3.0 | 3567 | 16 | 75 | 69 | 33.4% | 3447 |
+| Patricia 5.0 | 3539 | 36 | 77 | 87 | 37.2% | 3448 |
+| Sirius 9.0 | 3528 | 58 | 83 | 59 | 49.8% | 3526 |
+| Carp 3.0.1 | 3525 | 43 | 67 | 50 | 47.8% | 3510 |
+| Tucano 12.00 | 3491 | 51 | 85 | 64 | 46.8% | 3468 |
+| Leorik 3.2.1 | 3490 | 43 | 79 | 38 | 51.6% | 3501 |
+| Marvin 6.3.0 | 3458 | 69 | 89 | 42 | 56.8% | 3505 |
+| Stash 37 | 3424 | 96 | 71 | 33 | 65.8% | 3537 |
+| Fable 5.2 chess 24hrs | (3545) | 38 | 155 | 127 | 36.1% | – |
+| Opus 5.5 chess 24hrs | (3459) | 48 | 81 | 31 | 55.3% | – |
+| Sonnet 5.5 chess 24hrs | (3414) | 55 | 77 | 28 | 58.4% | – |
+| Fable 5.1 chess 24hrs | (3251) | 74 | 22 | 4 | 85.0% | – |
+
+Fable 5.2 won the main match clearly. A 36.1% score over 320 games is about 99 ± 27 Elo, and the two 160-game halves agreed (37.5% and 34.7%).
+
+### How firm the number is
+
+The figure depends on which reference engines are trusted. Clover and Coda play roughly 250 Elo above their CCRL Blitz ratings relative to the other anchors under these conditions, so the 10–14% scored against them pulls the fit down. Fable 5.2 was rated against the same ten anchors and is affected in the same way.
+
+| Fit | Gemini 4 Neon | Fable 5.2 |
+|---|---:|---:|
+| All games (the official figures) | 3470 ± 14 | 3545 ± 14 |
+| Without Clover and Coda | 3492 ± 15 | 3574 ± 15 |
+| Anchor games only | 3469 ± 16 | 3532 ± 16 |
+| Anchor games only, without Clover and Coda | 3494 ± 18 | 3565 ± 18 |
+
+Against the other eight anchors the implied rating runs from 3447 (Elixir) to 3537 (Stash 37). The two gauntlets differ for the same reason: the first, which includes Clover and Coda, gives 3430 ± 26 (3487 ± 31 without them), and the second gives 3497 ± 22. The games against the other AI-written engines agree with the anchors and barely move the estimate.
+
+One caveat applies to the comparison with Fable 5.2. Its anchor games were played on the Intel Core Ultra 9 285H and Gemini 4 Neon's on the Ryzen. The 320 direct games were all played on the Ryzen, and they show a slightly wider gap than the fit does.
+
+### Against the model's own estimate
+
+The model predicted about 3515 (3485–3545) from 300 games against Stash 37 and 100 against Stash 33. The official 3470 is 15 Elo below that range, and the fit without the two off-scale anchors, 3492, is inside it. Its Stash 37 result held up: 65.8% here against 62.3% in its own test. Stash 37 was simply the most favourable of the ten anchors, and the non-Stash engines near 3500 rate Gemini 4 Neon lower. The write-up's second caveat anticipated this, allowing a shift of 30–50 Elo against NNUE opponents on a different laptop.

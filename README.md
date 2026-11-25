@@ -1,5 +1,16 @@
 # Gemini 4 Neon chess 24hrs
 
+<p>
+  <a href="#official-results"><img alt="3470 ± 14 Elo on the CCRL Blitz scale" src="https://img.shields.io/badge/Elo-3470%20%C2%B1%2014-2980b9"></a>
+  <img alt="Written by Gemini 4 Neon" src="https://img.shields.io/badge/written%20by-Gemini%204%20Neon-8e44ad">
+  <img alt="Built in 24 hours" src="https://img.shields.io/badge/built%20in-24%20hours-c0392b">
+  <img alt="C++20" src="https://img.shields.io/badge/C%2B%2B-20-00599C?logo=cplusplus&logoColor=white">
+  <img alt="UCI engine" src="https://img.shields.io/badge/protocol-UCI-2ea44f">
+  <img alt="Self-trained NNUE evaluation" src="https://img.shields.io/badge/eval-self--trained%20NNUE-e67e22">
+  <img alt="Windows x64, needs AVX2 and BMI2" src="https://img.shields.io/badge/platform-Windows%20x64%20%28AVX2%2C%20BMI2%29-555555">
+  <a href="https://github.com/stevemaughan/chess-engine-benchmark"><img alt="24-Hour Chess Engine Benchmark" src="https://img.shields.io/badge/benchmark-24--Hour%20Chess%20Engine-1a1a1a"></a>
+</p>
+
 ## What This Is
 
 This repository contains **Gemini 4 Neon chess 24hrs**, a standalone UCI chess engine designed, written, trained, tuned, and verified entirely from scratch in **24 hours of wall-clock time** by **Gemini 4 Neon** as an entry in the **24-Hour Chess Engine Benchmark** (see `CLAUDE.md`).
@@ -216,7 +227,7 @@ Built-in CLI subcommands (for verification and self-play):
 
 ## Official Results
 
-*This section was added by the benchmark operator after the run. Everything above it is the model's own write-up.*
+*This section and the badges at the top were added by the benchmark operator after the run. Everything else is the model's own write-up.*
 
 **3470 ± 14 Elo (95% CI) on the CCRL Blitz scale**, from 2,540 games played on 24 November 2026 (+629 =1036 −875, 45.2%). That is second of the ten engines built under this benchmark so far: 75 Elo behind Fable 5.2 and 11 ahead of Opus 5.5.
 

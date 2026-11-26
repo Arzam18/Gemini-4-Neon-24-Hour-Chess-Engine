@@ -1,0 +1,56 @@
+name: Build Gemini 4 Neon for Android ARM64 (NEON)
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'source/src/**'
+      - 'source/data/gen5_4x768_65m.nnue'
+      - 'Makefile'
+      - '.github/workflows/android.yml'
+  pull_request:
+    paths:
+      - 'source/src/**'
+      - 'source/data/gen5_4x768_65m.nnue'
+      - 'Makefile'
+      - '.github/workflows/android.yml'
+
+jobs:
+  build:
+    name: Android ARM64 NEON
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          accept-android-sdk-licenses: true
+          packages: platform-tools
+
+      - name: Set up Android NDK
+        uses: android-actions/setup-ndk@v2
+        with:
+          ndk-version: 27.2.12479018
+
+      - name: Verify bundled NNUE network
+        run: |
+          test -s source/data/gen5_4x768_65m.nnue
+          echo "NNUE network present: $(stat -c '%s bytes' source/data/gen5_4x768_65m.nnue)"
+
+      - name: Build Android ARM64 NEON engine
+        run: make android-arm64
+
+      - name: Verify Android binary
+        run: |
+          test -s release/Gemini4Neonchess24hrs-arm64-android-neon
+          file release/Gemini4Neonchess24hrs-arm64-android-neon
+          readelf -h release/Gemini4Neonchess24hrs-arm64-android-neon | grep -E 'Class:|Machine:'
+
+      - name: Upload Android ARM64 engine
+        uses: actions/upload-artifact@v4
+        with:
+          name: Gemini4Neon-Android-ARM64-NEON
+          path: release/Gemini4Neonchess24hrs-arm64-android-neon
+          if-no-files-found: error

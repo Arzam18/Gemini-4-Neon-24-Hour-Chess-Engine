@@ -29,10 +29,16 @@ jobs:
           accept-android-sdk-licenses: true
           packages: platform-tools
 
-      - name: Set up Android NDK
-        uses: android-actions/setup-ndk@v2
-        with:
-          ndk-version: 27.2.12479018
+      - name: Install Android NDK
+        run: |
+          sdkmanager --install "ndk;27.2.12479018"
+          echo "ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/ndk/27.2.12479018" >> "$GITHUB_ENV"
+          echo "ANDROID_NDK_ROOT=$ANDROID_SDK_ROOT/ndk/27.2.12479018" >> "$GITHUB_ENV"
+
+      - name: Verify Android NDK
+        run: |
+          test -x "$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android24-clang++"
+          "$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android24-clang++" --version
 
       - name: Verify bundled NNUE network
         run: |

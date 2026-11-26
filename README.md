@@ -63,6 +63,29 @@ g++ -std=c++20 -O3 -march=x86-64-v3 -static -pthread `
     source/trainer/trainer.cpp -o source/build/trainer_4x768.exe
 ```
 
+### Android ARM64 (NEON) Build
+
+The Android build keeps the same 4x768 NNUE network and engine logic as the
+original x86-64 build. It uses AArch64 NEON for NNUE accumulator updates and
+inference, and a bit-exact software PEXT implementation for the BMI2 sliding
+attack table indices. The network format and search/evaluation parameters are
+unchanged.
+
+With Android NDK 27.2.12479018 installed and `ANDROID_NDK_HOME` set, build from
+the repository root with:
+
+```sh
+make android-arm64
+```
+
+The target embeds `source/data/gen5_4x768_65m.nnue` and writes
+`release/Gemini4Neonchess24hrs-arm64-android-neon`.
+
+**ARM DotProd is not enabled.** The current NNUE uses 16-bit weights and
+accumulators, while the optional DotProd instructions operate on 8-bit lanes.
+Using DotProd would require a separate network packing/quantization path and
+bit-exact evaluation validation; baseline ARM64 NEON preserves the current model.
+
 ### How to Run
 
 Standard UCI mode:

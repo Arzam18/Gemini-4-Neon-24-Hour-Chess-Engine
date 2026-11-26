@@ -4,7 +4,6 @@
 #include <cassert>
 #include <string>
 #include <algorithm>
-#include <immintrin.h>
 
 using U64 = uint64_t;
 using U32 = uint32_t;

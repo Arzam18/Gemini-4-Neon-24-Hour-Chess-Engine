@@ -2,7 +2,6 @@
 
 #include "position.h"
 #include "nnue_arch.h"
-#include <immintrin.h>
 #include <array>
 #include <string>
 

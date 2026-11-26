@@ -5,6 +5,12 @@
 #include <algorithm>
 #include <memory>
 
+#if defined(__aarch64__)
+#include <arm_neon.h>
+#else
+#include <immintrin.h>
+#endif
+
 namespace NNUE {
 
 const NNUEArch::QuantizedNet* gNet = nullptr;
@@ -51,6 +57,132 @@ bool is_loaded() {
 }
 
 namespace {
+
+#if defined(__aarch64__)
+
+inline void acc_add1(int16_t* dst, const int16_t* src, const int16_t* wAdd) {
+    constexpr int N = NNUEArch::HL;
+    for (int i = 0; i < N; i += 8)
+        vst1q_s16(dst + i, vaddq_s16(vld1q_s16(src + i), vld1q_s16(wAdd + i)));
+}
+
+inline void acc_sub1(int16_t* dst, const int16_t* src, const int16_t* wSub) {
+    constexpr int N = NNUEArch::HL;
+    for (int i = 0; i < N; i += 8)
+        vst1q_s16(dst + i, vsubq_s16(vld1q_s16(src + i), vld1q_s16(wSub + i)));
+}
+
+inline void acc_add1_sub1(int16_t* __restrict dst, const int16_t* __restrict src,
+                          const int16_t* __restrict wAdd, const int16_t* __restrict wSub) {
+    constexpr int N = NNUEArch::HL;
+    for (int i = 0; i < N; i += 8) {
+        int16x8_t a = vld1q_s16(src + i);
+        a = vaddq_s16(a, vld1q_s16(wAdd + i));
+        a = vsubq_s16(a, vld1q_s16(wSub + i));
+        vst1q_s16(dst + i, a);
+    }
+}
+
+inline void acc_add1_sub2(int16_t* __restrict dst, const int16_t* __restrict src,
+                          const int16_t* __restrict wAdd,
+                          const int16_t* __restrict wSub1, const int16_t* __restrict wSub2) {
+    constexpr int N = NNUEArch::HL;
+    for (int i = 0; i < N; i += 8) {
+        int16x8_t a = vld1q_s16(src + i);
+        a = vaddq_s16(a, vld1q_s16(wAdd + i));
+        a = vsubq_s16(a, vld1q_s16(wSub1 + i));
+        a = vsubq_s16(a, vld1q_s16(wSub2 + i));
+        vst1q_s16(dst + i, a);
+    }
+}
+
+inline void acc_add2_sub2(int16_t* __restrict dst, const int16_t* __restrict src,
+                          const int16_t* __restrict wAdd1, const int16_t* __restrict wAdd2,
+                          const int16_t* __restrict wSub1, const int16_t* __restrict wSub2) {
+    constexpr int N = NNUEArch::HL;
+    for (int i = 0; i < N; i += 8) {
+        int16x8_t a = vld1q_s16(src + i);
+        a = vaddq_s16(a, vld1q_s16(wAdd1 + i));
+        a = vaddq_s16(a, vld1q_s16(wAdd2 + i));
+        a = vsubq_s16(a, vld1q_s16(wSub1 + i));
+        a = vsubq_s16(a, vld1q_s16(wSub2 + i));
+        vst1q_s16(dst + i, a);
+    }
+}
+
+// Add products of two 8-lane vectors to two 4-lane int32 accumulators.
+// `lhs * weights` intentionally wraps to int16, matching AVX2 mullo.
+inline void madd16x8(int32x4_t& sumLo, int32x4_t& sumHi,
+                     int16x8_t lhs, int16x8_t weights, int16x8_t rhs) {
+    const int16x8_t product = vmulq_s16(lhs, weights);
+    sumLo = vmlal_s16(sumLo, vget_low_s16(product), vget_low_s16(rhs));
+    sumHi = vmlal_s16(sumHi, vget_high_s16(product), vget_high_s16(rhs));
+}
+
+inline int16x8_t clipped_acc(const int16_t* p) {
+    const int16x8_t zero = vdupq_n_s16(0);
+    const int16x8_t qa = vdupq_n_s16(NNUEArch::QA);
+    return vminq_s16(qa, vmaxq_s16(zero, vld1q_s16(p)));
+}
+
+inline int forward_l1(const int16_t* usAcc, const int16_t* themAcc, int outBucket) {
+    constexpr int N = NNUEArch::HL;
+    constexpr int HALF = N / 2;
+    const int16_t* wUs = gNet->l1Weights[outBucket];
+    const int16_t* wThem = wUs + NNUEArch::L1_PER_PERSP;
+
+    int32x4_t us0Lo = vdupq_n_s32(0), us0Hi = vdupq_n_s32(0);
+    int32x4_t us1Lo = vdupq_n_s32(0), us1Hi = vdupq_n_s32(0);
+    int32x4_t th0Lo = vdupq_n_s32(0), th0Hi = vdupq_n_s32(0);
+    int32x4_t th1Lo = vdupq_n_s32(0), th1Hi = vdupq_n_s32(0);
+
+    if constexpr (NNUEArch::PAIRWISE) {
+        for (int i = 0; i < HALF; i += 32) {
+            for (int j = 0; j < 16; j += 8) {
+                int16x8_t ua = clipped_acc(usAcc + i + j);
+                int16x8_t ub = clipped_acc(usAcc + HALF + i + j);
+                madd16x8(us0Lo, us0Hi, ua, vld1q_s16(wUs + i + j), ub);
+                int16x8_t ta = clipped_acc(themAcc + i + j);
+                int16x8_t tb = clipped_acc(themAcc + HALF + i + j);
+                madd16x8(th0Lo, th0Hi, ta, vld1q_s16(wThem + i + j), tb);
+            }
+            for (int j = 16; j < 32; j += 8) {
+                int16x8_t ua = clipped_acc(usAcc + i + j);
+                int16x8_t ub = clipped_acc(usAcc + HALF + i + j);
+                madd16x8(us1Lo, us1Hi, ua, vld1q_s16(wUs + i + j), ub);
+                int16x8_t ta = clipped_acc(themAcc + i + j);
+                int16x8_t tb = clipped_acc(themAcc + HALF + i + j);
+                madd16x8(th1Lo, th1Hi, ta, vld1q_s16(wThem + i + j), tb);
+            }
+        }
+    } else {
+        for (int i = 0; i < N; i += 32) {
+            for (int j = 0; j < 16; j += 8) {
+                int16x8_t u = clipped_acc(usAcc + i + j);
+                madd16x8(us0Lo, us0Hi, u, vld1q_s16(wUs + i + j), u);
+                int16x8_t t = clipped_acc(themAcc + i + j);
+                madd16x8(th0Lo, th0Hi, t, vld1q_s16(wThem + i + j), t);
+            }
+            for (int j = 16; j < 32; j += 8) {
+                int16x8_t u = clipped_acc(usAcc + i + j);
+                madd16x8(us1Lo, us1Hi, u, vld1q_s16(wUs + i + j), u);
+                int16x8_t t = clipped_acc(themAcc + i + j);
+                madd16x8(th1Lo, th1Hi, t, vld1q_s16(wThem + i + j), t);
+            }
+        }
+    }
+
+    const int64_t sum64 =
+        int64_t(vaddlvq_s32(us0Lo)) + vaddlvq_s32(us0Hi) +
+        vaddlvq_s32(us1Lo) + vaddlvq_s32(us1Hi) +
+        vaddlvq_s32(th0Lo) + vaddlvq_s32(th0Hi) +
+        vaddlvq_s32(th1Lo) + vaddlvq_s32(th1Hi);
+    const int32_t sum = static_cast<int32_t>(sum64);
+    const int32_t output = (sum / NNUEArch::QA) + gNet->l1Bias[outBucket];
+    return int((int64_t(output) * NNUEArch::SCALE) / (NNUEArch::QA * NNUEArch::QB));
+}
+
+#else
 
 inline void acc_add1(int16_t* dst, const int16_t* src, const int16_t* wAdd) {
     constexpr int N = NNUEArch::HL;
@@ -174,6 +306,8 @@ inline int forward_l1(const int16_t* usAcc, const int16_t* themAcc, int outBucke
     int32_t output = (sum / NNUEArch::QA) + gNet->l1Bias[outBucket];
     return int((int64_t(output) * NNUEArch::SCALE) / (NNUEArch::QA * NNUEArch::QB));
 }
+
+#endif // AArch64 NEON / x86 AVX2
 
 inline bool needs_refresh(Color persp, Square from, Square to) {
     int relFrom = int(from) ^ (int(persp) * 56);

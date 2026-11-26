@@ -97,7 +97,7 @@ void init() {
         Bitboard m = RookMasks[s];
         Bitboard sub = 0;
         do {
-            U64 idx = _pext_u64(sub, m);
+            U64 idx = pext_u64(sub, m);
             RookTable[rOff + idx] = sliding_attacks_slow(Square(s), sub, rookDirs);
             sub = (sub - m) & m;
         } while (sub != 0);
@@ -108,7 +108,7 @@ void init() {
         m = BishopMasks[s];
         sub = 0;
         do {
-            U64 idx = _pext_u64(sub, m);
+            U64 idx = pext_u64(sub, m);
             BishopTable[bOff + idx] = sliding_attacks_slow(Square(s), sub, bishopDirs);
             sub = (sub - m) & m;
         } while (sub != 0);
